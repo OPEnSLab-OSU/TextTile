@@ -1,0 +1,26 @@
+{
+  "name": "loom_configurator",
+  "version": "1.0.0",
+  "description": "A dashboard that interprets a provided version of the Loom Library in order to generate an interface for intuitivly creating and exporting a Loom project configuration.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/OPEnSLab-OSU/Loom_Configurator.git"
+  },
+  "keywords": [
+    "Loom"
+  ],
+  "author": "OPEnSLab-OSU",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/OPEnSLab-OSU/Loom_Configurator/issues"
+  },
+  "homepage": "https://github.com/OPEnSLab-OSU/Loom_Configurator#readme",
+  "dependencies": {
+    "express": "^4.16.4",
+    "npm": "^6.9.0"
+  }
+}
