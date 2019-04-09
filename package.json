@@ -20,7 +20,9 @@
   },
   "homepage": "https://github.com/OPEnSLab-OSU/Loom_Configurator#readme",
   "dependencies": {
+    "cheerio": "^1.0.0-rc.3",
     "express": "^4.16.4",
-    "npm": "^6.9.0"
+    "npm": "^6.9.0",
+    "request": "^2.88.0"
   }
 }

@@ -21,6 +21,7 @@ getFileFromGitHub(url, fileToGet);
 // function to get file from Github and write to disk
 function getFileFromGitHub(url, fileToGet){
   let content, fileUrl, rawFileUrl;
+  var fileNames = {}
 
   // make a GET request to the above URL
   request(url.href, (error, response, body) => {
@@ -29,13 +30,13 @@ function getFileFromGitHub(url, fileToGet){
     // console.log(content);
     for (var key in content){
       if(content[key].attribs){
+        fileNames[content[key].attribs.title] = {}
         if(content[key].attribs.title == fileToGet){
           fileUrl = new URL (content[key].attribs.href, baseUrl);
-          break;
         }
       }
     }
-
+    console.log(fileNames);
     // make a new GET request to the fileUrl page on github
     request(fileUrl.href, (error, response, body) => {
       var $ = cheerio.load(body);
