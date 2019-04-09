@@ -1,7 +1,8 @@
-const express = require('express')
-const app = express()
-const port = 3000
+// Test file to illustrate loom-github module
 
-app.get('/', (req, res) => res.send('Hello World'))
 
-app.listen(port, () => console.log('Example app listening on port ' + port + '!'))
+var loom = require('./loom-github');
+
+
+// at this point getFile only prints to stdout
+loom.getFile({'file': process.argv[2]});
