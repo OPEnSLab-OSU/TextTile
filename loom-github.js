@@ -22,6 +22,10 @@ var loom_github = {
     return rpn(options);
   },
 
+  'setBranch': function (branch){
+
+  },
+
   'findFile': function (contents){
     return contents;
     // for (var key in contents){
@@ -62,7 +66,7 @@ var loom_github = {
 exports.getFile = function(params){
   // required for request-promise-native module
   var options = {
-    'uri': 'https://api.github.com/repos/OPEnSLab-OSU/Loom/contents/' + params.file,
+    'uri': 'https://api.github.com/repos/OPEnSLab-OSU/Loom/contents/Loom/src/' + params.file,
     'headers': {
       'User-Agent': 'Loom Configurator App'
     },
