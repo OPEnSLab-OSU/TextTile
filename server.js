@@ -27,6 +27,8 @@ app.set('view engine', 'handlebars');
 app.use(express.static('public'));
 app.use(bodyParser.json());
 
+
+// route for index GET request
 app.get('/', (req, res, next) => {
   var tree = loom.getTree();
   console.log(tree[0]);
@@ -39,6 +41,8 @@ app.get('/', (req, res, next) => {
 //     res.status(200).render('directory', context);
 //   });
 // });
+
+
 
 app.get('/Loom/src', (req, res, next) => {
   var filePath = '';
@@ -75,6 +79,12 @@ app.get('/Loom/src/:dir/:file', (req, res, next) => {
     res.status(200).render('file', context);
   });
 });
+
+//****************************************************************************//
+//*********             Begin script              ****************************//
+//** loom.init takes an object with at least one member called 'branch',    **//
+//** and saves the branch_sha and the latest commit sha to memory. Then     **//
+//** then loom.buildTree GET's the repo tree recursively and saves to mem.  **//
 
 loom.init({'branch': 'develop'})
   .then(loom.buildTree)
