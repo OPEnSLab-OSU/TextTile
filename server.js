@@ -27,13 +27,18 @@ app.set('view engine', 'handlebars');
 app.use(express.static('public'));
 app.use(bodyParser.json());
 
-
 app.get('/', (req, res, next) => {
-  var filePath = '';
-  loom.getFile({'file': filePath}).then((context) => {
-    res.status(200).render('directory', context);
-  });
+  var tree = loom.getTree();
+  console.log(tree[0]);
+  res.status(200).render('directory', tree);
 });
+
+// app.get('/', (req, res, next) => {
+//   var filePath = '';
+//   loom.getFile({'file': filePath}).then((context) => {
+//     res.status(200).render('directory', context);
+//   });
+// });
 
 app.get('/Loom/src', (req, res, next) => {
   var filePath = '';
@@ -45,7 +50,6 @@ app.get('/Loom/src', (req, res, next) => {
 app.get('/Loom/src/:file', (req, res, next) => {
   var filePath = req.params.file;
   loom.getFile({'file': filePath}).then((context) => {
-    console.log(context);
     if(Array.isArray(context)){
       context.forEach((entry) => {
         entry.path = entry.path.replace('Loom/src/', '');
@@ -53,7 +57,9 @@ app.get('/Loom/src/:file', (req, res, next) => {
       res.status(200).render('directory', context);
     }
     else{
-      console.log(context);
+      var buff = Buffer.from(context.content, 'Base64');
+      context.content = buff.toString('ascii');
+      loom.parse(context.content);
       res.status(200).render('file', context);
     }
   });
@@ -64,12 +70,13 @@ app.get('/Loom/src/:dir/:file', (req, res, next) => {
   var filePath = `${req.params.dir}/${req.params.file}`;
 
   loom.getFile({'file': filePath}).then((context) => {
-    // context.path = filePath;
     var buff = Buffer.from(context.content, 'Base64');
     context.content = buff.toString('ascii');
     res.status(200).render('file', context);
   });
 });
 
+loom.init({'branch': 'develop'})
+  .then(loom.buildTree)
 
 app.listen(port, () => console.log('Example app listening on port ' + port + '!'));

@@ -22,39 +22,8 @@ var loom_github = {
     return rpn(options);
   },
 
-  'setBranch': function (branch){
-
-  },
-
   'findFile': function (contents){
     return contents;
-    // for (var key in contents){
-    //   if(contents[key]){
-    //     if(contents[key].type == 'dir'){
-    //       console.log(contents[key].name + '/');
-    //     }
-    //     else{
-    //       console.log(contents[key].name);
-    //     }
-    //   }
-    // }
-    // console.log(contents);
-    // if(options.file.includes('/')){
-    //   options.file = options.file.split('/');
-    //   contents.forEach((file) => {
-    //     if(file.type == 'dir' && file.name == options.file[0]){
-    //       options.uri = new URL (file.url).href;
-    //     }
-    //   });
-    // }
-    // else{
-    //   contents.forEach((file) => {
-    //     if(file.name == options.file){
-    //       options.uri = new URL (file.download_url).href;
-    //     }
-    //   });
-    // }
-    // return rpn(options);
   },
 
   'print': function(file){
@@ -63,7 +32,51 @@ var loom_github = {
 };
 
 
-exports.getFile = function(params){
+exports.auth = function(){
+  return loom_github.auth;
+};
+
+exports.parse = (content) => {
+  console.log(content);
+};
+
+exports.init = (params) => {
+  loom_github.branch = params.branch;
+  var options = {
+    'uri': 'https://api.github.com/repos/OPEnSLab-OSU/Loom/branches/' + params.branch,
+    'headers': {
+      'User-Agent': 'Loom Configurator App'
+    },
+    'json': true,
+  };
+  return rpn(options).then((context) => {
+    // console.log(context);
+    loom_github.branch_sha = context.commit.sha;
+    loom_github.tree_sha = context.commit.commit.tree.sha;
+    console.log(loom_github);
+  });
+};
+
+exports.buildTree = () => {
+  var options = {
+    'uri': 'https://api.github.com/repos/OPEnSLab-OSU/Loom/git/trees/' + loom_github.tree_sha + '?recursive=1',
+    'headers': {
+      'User-Agent': 'Loom Configurator App'
+    },
+    'json': true,
+  };
+  return rpn(options).then((context) => {
+    loom_github.tree = context;
+  });
+};
+
+exports.getTree = () => {
+  // console.log(loom_github.tree);
+  return loom_github.tree.tree;
+}
+
+
+exports.getFile = (params) => {
   // required for request-promise-native module
   var options = {
     'uri': 'https://api.github.com/repos/OPEnSLab-OSU/Loom/contents/Loom/src/' + params.file,
