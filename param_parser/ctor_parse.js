@@ -8,6 +8,9 @@
 * tabs (\t) as a delimiter for each parameter property. This demo
 * only uses the provided OLED_ctor.h file provided, although it may
 * be modified to handle any header file with doxygen syntax.
+*
+* Use: there are no dependencies as this commit. run with:
+*		>$ node ctor_parse.js   
 */
 
 const fs = require('fs');
