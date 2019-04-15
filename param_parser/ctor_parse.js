@@ -61,12 +61,6 @@ function parse_params(files){
 	return new Promise((resolve, reject) => {
 		resolve(json_obj);
 	});
-
-	// write file to disk to demonstrate stringify, and print json object to console
-	// fs.writeFile('test.json', JSON.stringify(json_obj), (err) => {
-		// if(err) throw err;
-		// return json_obj;
-	// });
 };
 
 // Main driver for ctor_parse program
