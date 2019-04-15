@@ -43,7 +43,6 @@ app.get('/', (req, res, next) => {
 // });
 
 
-
 app.get('/Loom/src', (req, res, next) => {
   var filePath = '';
   loom.getFile({'file': filePath}).then((context) => {
