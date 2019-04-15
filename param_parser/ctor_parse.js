@@ -1,8 +1,29 @@
+
+// ============================================================
+// 												ctor_parse.js											===
+// ============================================================
+/*
+* This program demos a possible implementation for reading/parsing
+* C header files. It looks for the doxygen /param syntax and uses
+* tabs (\t) as a delimiter for each parameter property. This demo
+* only uses the provided OLED_ctor.h file provided, although it may
+* be modified to handle any header file with doxygen syntax.
+*/
+
 const fs = require('fs');
 const {promisify} = require('util');
 const readFile = promisify(fs.readFile);
 const readdir = promisify(fs.readdir);
 
+// ============================================================
+// ===						read_header_files()												===
+// ============================================================
+/*
+*	dir is a string representing the directory to read. It will
+* look for all .h files in dir. It returns a promise once all
+* readFile() operations have completed for every header file
+* found in dir.
+*/
 
 function read_header_files(dir) {
   let dir_contents = [];
@@ -17,6 +38,15 @@ function read_header_files(dir) {
       return Promise.all(promises);
     });
 };
+
+// ============================================================
+// ===								parse_params()												===
+// ============================================================
+/*
+*	files is an array of strings, where each string is the entire
+* contents the header file found by the previously called
+* read_header_files().
+*/
 
 function parse_params(files){
   var json_obj = {};
@@ -63,7 +93,10 @@ function parse_params(files){
 	});
 };
 
-// Main driver for ctor_parse program
+// ================================================================
+// 								Main driver for ctor_parse program						===
+// ================================================================
+
 function main() {
   const master_json = {};
 
