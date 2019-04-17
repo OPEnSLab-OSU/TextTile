@@ -79,13 +79,15 @@ app.get('/Loom/src/:dir/:file', (req, res, next) => {
   });
 });
 
-//****************************************************************************//
-//*********             Begin script              ****************************//
-//** loom.init takes an object with at least one member called 'branch',    **//
-//** and saves the branch_sha and the latest commit sha to memory. Then     **//
-//** then loom.buildTree GET's the repo tree recursively and saves to mem.  **//
+
+//=========================================================================== //
+//===========           Begin script              =========================== //
+// == loom.init takes an object with at least one member called 'branch',  === //
+// == and saves the branch_sha and the latest commit sha to memory. Then   === //
+// == then loom.buildTree GET's the repo tree recursively and saves to mem.  = //
 
 loomify.init({'branch': 'develop'})
   .then(loomify.buildTree)
+	.then(loomify.parse) // == This probably doesnt work yet, but it is the goal
 
 app.listen(port, () => console.log('Example app listening on port ' + port + '!'));
