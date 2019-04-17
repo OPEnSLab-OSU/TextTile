@@ -1,7 +1,7 @@
 /*
 * Loom module dependencies
 */
-const loom = require('./loom-github');
+const loomify = require('./loomify');
 
 /*
 * Nodejs module dependencies
@@ -85,7 +85,7 @@ app.get('/Loom/src/:dir/:file', (req, res, next) => {
 //** and saves the branch_sha and the latest commit sha to memory. Then     **//
 //** then loom.buildTree GET's the repo tree recursively and saves to mem.  **//
 
-loom.init({'branch': 'develop'})
-  .then(loom.buildTree)
+loomify.init({'branch': 'develop'})
+  .then(loomify.buildTree)
 
 app.listen(port, () => console.log('Example app listening on port ' + port + '!'));

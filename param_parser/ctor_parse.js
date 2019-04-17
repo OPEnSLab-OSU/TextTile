@@ -10,32 +10,35 @@
 * be modified to handle any header file with doxygen syntax.
 *
 * Use: there are no dependencies as this commit. run with:
-*		>$ node ctor_parse.js   
+*		>$ node ctor_parse.js
 */
 
 const fs = require('fs');
 const {promisify} = require('util');
 const readFile = promisify(fs.readFile);
 const readdir = promisify(fs.readdir);
+const path = require('path');
+
 
 // ============================================================
 // ===						read_header_files()												===
 // ============================================================
 /*
-*	dir is a string representing the directory to read. It will
-* look for all .h files in dir. It returns a promise once all
-* readFile() operations have completed for every header file
-* found in dir.
+*	Params: dir is a string representing the directory to read. It will
+* look for all .h files in dir.
+*	Returns: A promise once all readFile() operations have completed
+*	for every header file found in dir.
 */
 
 function read_header_files(dir) {
+	console.log(dir);
   let dir_contents = [];
   let promises = [];
   return readdir(dir)
     .then((contents) => {
       for (var tmp_file of contents){
         if(tmp_file.includes('.h')){
-          promises.push(readFile(tmp_file, 'utf8'));
+          promises.push(readFile(dir + '/' + tmp_file, 'utf8'));
         }
       };
       return Promise.all(promises);
@@ -46,75 +49,124 @@ function read_header_files(dir) {
 // ===								parse_params()												===
 // ============================================================
 /*
-*	files is an array of strings, where each string is the entire
-* contents the header file found by the previously called
+*	Params: files is an array of strings, where each string is the entire
+* contents of the *.h file found by the previously called
 * read_header_files().
 */
 
 function parse_params(files){
-  var json_obj = {};
+	let promises = [];
 
-	// for each file split the file string into lines at newline
-  for(var file of files){
+	for(file of files){	// for each file find param tags and build json
+		promises.push(
+			find_param_tags(file)
+			.then(build_module_json)
+		);
+	}
+
+	return Promise.all(promises);
+
+};
+
+
+function find_param_tags(file){
+	return new Promise((resolve, reject) => {
 		var params = [];
-    var lines = file.split('\n');
 
-		// if string "param\t is found push the string into params array"
+		// split the file string at newline chars
+	  var lines = file.split('\n');
+
 	  for(var line of lines){
-			var pos = line.search('param\t');
-			if(pos >= 0)
-				params.push(line.substr(pos + 'param\t'.length));
+
+			if(line.search('///') > 0){
+				// look for the \param tag and save substring to param_line, else param_line is null
+				var param_line = (line.search('\\param') > 0) ? line.substr(line.search('param')).trim() : null;
+
+				if(param_line){
+					// find end of the 'param[in]' tag
+					param_line = param_line.substring(param_line.search(']') +1).trim();
+					// insert a bar after key name to add a string.split() point
+					param_line = param_line.replace(/[\s]/, '|');
+					params.push(param_line);
+				}
+			}
 	  }
 
-		// create a 'clean' array of each param item, ex: ['name', 'data type', 'decript']
+		// create a 'clean' array of each param item, ex: ['key', 'data type/range', 'desc']
 		for(var i = 0; i < params.length; i++){
-			var tmp = params.shift().split('\t');
-			params.push(tmp);
+			params[i] = params[i].split('|');
+
+			for(var j = 0; j < params[i].length; j++){
+				params[i][j] = params[i][j].trim(); // remove all leading/trailing whitespace from each element
+			}
 		}
+
+		// resolve the promise with the params array
+		resolve(params);
+	});
+};
+
+
+function build_module_json(param_array){
+	return new Promise((resolve, reject) => {
+		var json_obj = {};
 
 		// find the module name and assign it to the json_obj, and build structure of
 		// child json object
-		var module_name;
-		for(var param of params){
+		for(var param of param_array){
 			if(param[0] == 'module_name'){
-				module_name = param[2];
+				var module_name = param[1].substring(param[1].indexOf('<"')+2, param[1].indexOf('">'));
 				json_obj[module_name] = {};
-				json_obj[module_name].description = 'Module name';
+				json_obj[module_name].description = 'Module description';
 				json_obj[module_name].parameters = {};
 				break;
 			}
 		}
 
 		// populate the parameters key with key/value pairs taken from the params array
-		for(var param of params){
-			json_obj[module_name].parameters[param[0]] = param[1];
+		for(var param of param_array){
+			json_obj[module_name].parameters[param[0]] = {
+				'type': param[1],
+				'value': param[1].substring(param[1].indexOf('<')+1, param[1].indexOf('>')),
+				'description': param[2],
+			}
 		}
-	}
 
-	return new Promise((resolve, reject) => {
 		resolve(json_obj);
 	});
-};
+}
+
+
+
 
 // ================================================================
 // 								Main driver for ctor_parse program						===
 // ================================================================
 
-function main() {
-  const master_json = {};
+exports.parse = function(dir) {
+  const master_json = {
+		'general': {},
+		'components': []
+	};
 
 	// first read all header files in local directory
-	read_header_files('./')
+	read_header_files(dir)
   	.then(parse_params) // then for each header file found, look for and parse all '/param' values
-		.then((json_data) => { // then add the resulting json_data to the master_json
-			master_json['CommPlats'] = json_data;
+		.then((json_data_array) => { // then add the resulting json_data to the master_json
+			for(var module of json_data_array){
+				var key = Object.keys(module);
+				master_json.components.push(module);
+				console.log(module);
+			}
+
+			console.log(master_json);
 
 			fs.writeFile('test.json', JSON.stringify(master_json), (err) => {
 				if(err) throw err;
 				console.log('data written to test.json');
-				console.log(master_json.CommPlats);
 			});
+			return master_json;
 		});
 };
 
-main();
+// parse('test_files');
