@@ -1,2 +1,2 @@
 # Loom_Configurator
-A WebApp designed for designing and exporting loom configurations.
+A WebApp for designing and exporting loom configurations.
