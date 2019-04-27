@@ -1,0 +1,5 @@
+{ general: {},
+  components:
+   { LoRa: { description: 'Module description', parameters: [Object] },
+     OLED: { description: 'Module description', parameters: [Object] } } }
+data written to test.json
